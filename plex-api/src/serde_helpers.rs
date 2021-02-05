@@ -1,12 +1,12 @@
 use std::fmt::Display;
+use std::iter::FromIterator;
 use std::result::Result;
 use std::str::FromStr;
 
-use chrono::{DateTime, Utc};
-use serde::de::{self, Deserializer, Visitor};
+use chrono::{DateTime, NaiveDateTime, Utc};
+use serde::de::{self, Deserializer};
 use serde::Deserialize;
-use std::fmt;
-use std::iter::FromIterator;
+use serde_aux::field_attributes::deserialize_number_from_string;
 
 pub(crate) fn option_bool_from_anything<'de, D>(deserializer: D) -> Result<Option<bool>, D::Error>
 where
@@ -46,22 +46,8 @@ pub(crate) fn duration_from_seconds<'de, D>(deserializer: D) -> Result<chrono::D
 where
     D: Deserializer<'de>,
 {
-    struct DurationVisitor;
-
-    impl<'de> Visitor<'de> for DurationVisitor {
-        type Value = chrono::Duration;
-
-        fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-            formatter.write_str("a JSON number")
-        }
-
-        #[inline]
-        fn visit_u64<E>(self, value: u64) -> Result<chrono::Duration, E> {
-            Ok(chrono::Duration::milliseconds(value as i64))
-        }
-    }
-
-    deserializer.deserialize_u64(DurationVisitor)
+    let number = deserialize_number_from_string::<u64, D>(deserializer)?;
+    Ok(chrono::Duration::milliseconds(number as i64))
 }
 
 pub(crate) fn option_duration_from_seconds<'de, D>(
@@ -71,6 +57,26 @@ where
     D: de::Deserializer<'de>,
 {
     duration_from_seconds(d).map(Option::from)
+}
+
+pub(crate) fn datetime_from_seconds_string<'de, D>(
+    d: D,
+) -> Result<DateTime<Utc>, D::Error>
+where
+    D: de::Deserializer<'de>,
+{
+    let number = deserialize_number_from_string::<i64, D>(d)?;
+    Ok(DateTime::from_utc(NaiveDateTime::from_timestamp(number, 0), Utc))
+}
+
+pub(crate) fn option_datetime_from_seconds_string<'de, D>(
+    d: D,
+) -> Result<Option<DateTime<Utc>>, D::Error>
+where
+    D: de::Deserializer<'de>,
+{
+    let number = deserialize_number_from_string::<i64, D>(d)?;
+    Ok(Some(DateTime::from_utc(NaiveDateTime::from_timestamp(number, 0), Utc)))
 }
 
 pub(crate) fn date_from_iso<'de, D>(d: D) -> Result<chrono::Date<Utc>, D::Error>

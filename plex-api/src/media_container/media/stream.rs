@@ -1,13 +1,43 @@
+use std::convert::Infallible;
+use std::str::FromStr;
+
 use serde::{Deserialize, Deserializer};
+use serde_aux::field_attributes::{
+    deserialize_number_from_string,
+    deserialize_option_number_from_string,
+};
 use serde_repr::Deserialize_repr;
 
 #[derive(Debug, Deserialize_repr, Clone)]
 #[repr(u8)]
 enum MediaStreamType {
+    Unknown = 0,
     Video = 1,
     Audio = 2,
     Subtitles = 3,
     Lyrics = 4,
+}
+
+impl Default for MediaStreamType {
+    fn default() -> MediaStreamType {
+        MediaStreamType::Unknown
+    }
+}
+
+impl FromStr for MediaStreamType {
+    type Err = Infallible;
+
+    fn from_str(s: &str) -> Result<MediaStreamType, Self::Err> {
+        Ok(u8::from_str(s)
+            .map(|v| match v {
+                1 => MediaStreamType::Video,
+                2 => MediaStreamType::Audio,
+                3 => MediaStreamType::Subtitles,
+                4 => MediaStreamType::Lyrics,
+                _ => MediaStreamType::Unknown,
+            })
+            .unwrap_or(MediaStreamType::Unknown))
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -18,16 +48,21 @@ pub enum MediaStream {
     Lyrics(LyricsStream),
 }
 
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Debug, Default, Deserialize, Clone)]
 #[cfg_attr(all(test, feature = "test_new_attributes"), serde(deny_unknown_fields))]
-#[serde(rename_all = "camelCase")]
+#[serde(default, rename_all = "camelCase")]
 struct MediaStreamStruct {
+    #[serde(deserialize_with = "deserialize_number_from_string")]
     id: u32,
+    #[serde(deserialize_with = "deserialize_number_from_string")]
     stream_type: MediaStreamType,
     default: Option<bool>,
+    #[serde(deserialize_with = "crate::serde_helpers::option_bool_from_anything")]
     selected: Option<bool>,
     codec: String,
-    index: u8,
+    #[serde(deserialize_with = "deserialize_option_number_from_string")]
+    index: Option<u8>,
+    #[serde(deserialize_with = "deserialize_option_number_from_string")]
     bitrate: Option<u32>,
     chroma_subsampling: Option<String>,
     chroma_location: Option<String>,
@@ -47,26 +82,33 @@ struct MediaStreamStruct {
     display_title: String,
     has_scaling_matrix: Option<bool>,
     scan_type: Option<String>,
+    #[serde(deserialize_with = "deserialize_option_number_from_string")]
     bit_depth: Option<u16>,
+    #[serde(deserialize_with = "deserialize_option_number_from_string")]
     sampling_rate: Option<u32>,
+    #[serde(deserialize_with = "deserialize_option_number_from_string")]
     channels: Option<u8>,
     audio_channel_layout: Option<String>,
     key: Option<String>,
     title: Option<String>,
     language: Option<String>,
     language_code: Option<String>,
-    #[serde(
-        default,
-        deserialize_with = "crate::serde_helpers::option_bool_from_anything"
-    )]
+    #[serde(deserialize_with = "crate::serde_helpers::option_bool_from_anything")]
     embedded_in_video: Option<bool>,
     extended_display_title: Option<String>,
+    #[serde(deserialize_with = "deserialize_option_number_from_string")]
     album_gain: Option<f32>,
+    #[serde(deserialize_with = "deserialize_option_number_from_string")]
     album_peak: Option<f32>,
+    #[serde(deserialize_with = "deserialize_option_number_from_string")]
     album_range: Option<f32>,
+    #[serde(deserialize_with = "deserialize_option_number_from_string")]
     gain: Option<f32>,
+    #[serde(deserialize_with = "deserialize_option_number_from_string")]
     loudness: Option<f32>,
+    #[serde(deserialize_with = "deserialize_option_number_from_string")]
     lra: Option<f32>,
+    #[serde(deserialize_with = "deserialize_option_number_from_string")]
     peak: Option<f32>,
     format: Option<String>,
     provider: Option<String>,
@@ -81,7 +123,7 @@ macro_rules! media_stream_enum {
             id: u32,
             stream_type: MediaStreamType,
             codec: String,
-            index: u8,
+            index: Option<u8>,
             display_title: String,
             $($field_name: $field_type,)+
         }
@@ -143,7 +185,7 @@ media_stream_enum! {
         ref_frames: u64,
         has_scaling_matrix: bool,
         scan_type: String,
-        bit_depth: u16,
+        bit_depth: Option<u16>,
     }
 }
 
@@ -187,6 +229,7 @@ media_stream_enum! {
 impl MediaStream {
     fn new(stream: MediaStreamStruct) -> Self {
         match stream.stream_type {
+            MediaStreamType::Unknown => unimplemented!(),
             MediaStreamType::Video => MediaStream::Video(VideoStream::from(stream)),
             MediaStreamType::Audio => MediaStream::Audio(AudioStream::from(stream)),
             MediaStreamType::Subtitles => MediaStream::Subtitles(SubtitlesStream::from(stream)),

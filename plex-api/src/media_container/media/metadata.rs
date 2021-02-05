@@ -1,3 +1,5 @@
+use serde_aux::field_attributes::deserialize_number_from_string;
+
 use crate::{MediaStream, MediaType};
 use uuid::Uuid;
 
@@ -5,16 +7,18 @@ use uuid::Uuid;
 #[cfg_attr(all(test, feature = "test_new_attributes"), serde(deny_unknown_fields))]
 #[serde(rename_all = "camelCase")]
 pub struct MediaPart {
+    #[serde(deserialize_with = "deserialize_number_from_string")]
     id: u32,
     key: String,
     #[serde(deserialize_with = "crate::serde_helpers::duration_from_seconds")]
     duration: chrono::Duration,
     file: String,
+    #[serde(deserialize_with = "deserialize_number_from_string")]
     size: u64,
     container: String,
     indexes: Option<String>,
-    audio_profile: String,
-    video_profile: String,
+    audio_profile: Option<String>,
+    video_profile: Option<String>,
     #[serde(default, rename = "Stream")]
     streams: Vec<MediaStream>,
 }
@@ -32,21 +36,24 @@ pub struct MediaTag {
 #[cfg_attr(all(test, feature = "test_new_attributes"), serde(deny_unknown_fields))]
 #[serde(rename_all = "camelCase")]
 pub struct Media {
+    #[serde(deserialize_with = "deserialize_number_from_string")]
     id: u32,
     #[serde(deserialize_with = "crate::serde_helpers::duration_from_seconds")]
     duration: chrono::Duration,
+    #[serde(deserialize_with = "deserialize_number_from_string")]
     bitrate: u32,
-    width: u16,
-    height: u16,
-    aspect_ratio: f32,
+    width: Option<u16>,
+    height: Option<u16>,
+    aspect_ratio: Option<f32>,
+    #[serde(deserialize_with = "deserialize_number_from_string")]
     audio_channels: u8,
     audio_codec: String,
-    video_codec: String,
-    video_resolution: String,
+    video_codec: Option<String>,
+    video_resolution: Option<String>,
     container: String,
-    video_frame_rate: String,
-    audio_profile: String,
-    video_profile: String,
+    video_frame_rate: Option<String>,
+    audio_profile: Option<String>,
+    video_profile: Option<String>,
     #[serde(rename = "Part")]
     parts: Option<Vec<MediaPart>>,
 }
@@ -55,12 +62,12 @@ pub struct Media {
 #[cfg_attr(all(test, feature = "test_new_attributes"), serde(deny_unknown_fields))]
 #[serde(rename_all = "camelCase")]
 pub struct MediaMetadata {
-    allow_sync: bool,
-    #[serde(rename = "librarySectionID")]
+    allow_sync: Option<bool>,
+    #[serde(rename = "librarySectionID", deserialize_with = "deserialize_number_from_string")]
     library_section_id: u32,
     library_section_title: String,
     #[serde(rename = "librarySectionUUID")]
-    library_section_uuid: Uuid,
+    library_section_uuid: Option<Uuid>,
     rating_key: String,
     key: String,
     skip_parent: Option<bool>,
@@ -79,7 +86,9 @@ pub struct MediaMetadata {
     parent_title: Option<String>,
     content_rating: Option<String>,
     summary: String,
+    #[serde(deserialize_with = "crate::serde_helpers::option_int_from_string")]
     index: Option<u32>,
+    #[serde(deserialize_with = "crate::serde_helpers::option_int_from_string")]
     parent_index: Option<u32>,
     #[serde(
         default,
@@ -102,10 +111,10 @@ pub struct MediaMetadata {
         deserialize_with = "crate::serde_helpers::option_date_from_iso"
     )]
     originally_available_at: Option<chrono::Date<chrono::Utc>>,
-    #[serde(with = "chrono::serde::ts_seconds")]
+    #[serde(deserialize_with = "crate::serde_helpers::datetime_from_seconds_string")]
     added_at: chrono::DateTime<chrono::Utc>,
-    #[serde(with = "chrono::serde::ts_seconds")]
-    updated_at: chrono::DateTime<chrono::Utc>,
+    #[serde(default, deserialize_with = "crate::serde_helpers::option_datetime_from_seconds_string")]
+    updated_at: Option<chrono::DateTime<chrono::Utc>>,
     #[serde(default, rename = "Media")]
     media: Vec<Media>,
     #[serde(rename = "Genre")]
