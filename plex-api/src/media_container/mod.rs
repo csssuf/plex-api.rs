@@ -2,6 +2,7 @@ mod device;
 mod library;
 mod media;
 mod server;
+mod session;
 mod settings;
 mod user;
 
@@ -9,6 +10,7 @@ pub use self::device::*;
 pub use self::library::*;
 pub use self::media::*;
 pub use self::server::*;
+pub use self::session::*;
 pub use self::settings::*;
 pub use self::user::*;
 

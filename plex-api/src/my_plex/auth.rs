@@ -13,7 +13,7 @@ impl MyPlexAccount {
         let params = [
             ("login", username),
             ("password", password),
-            ("mememberMe", "true"),
+            ("rememberMe", "true"),
         ];
 
         let rb: reqwest::RequestBuilder = { get_http_client()?.post(MYPLEX_LOGIN_URL) };

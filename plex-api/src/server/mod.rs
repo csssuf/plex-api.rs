@@ -21,6 +21,7 @@ macro_rules! required_server_version {
 
 mod connect;
 mod my_plex;
+mod session;
 mod settings;
 
 use crate::library::Library;
