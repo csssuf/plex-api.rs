@@ -35,7 +35,7 @@ pub struct Directory {
     title: String,
 }
 
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Debug, Deserialize, Clone, PartialEq)]
 #[cfg_attr(all(test, feature = "test_new_attributes"), serde(deny_unknown_fields))]
 #[serde(rename_all = "lowercase")]
 pub enum MediaType {

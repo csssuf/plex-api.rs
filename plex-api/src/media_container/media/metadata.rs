@@ -8,19 +8,19 @@ use uuid::Uuid;
 #[serde(rename_all = "camelCase")]
 pub struct MediaPart {
     #[serde(deserialize_with = "deserialize_number_from_string")]
-    id: u32,
-    key: String,
+    pub id: u32,
+    pub key: String,
     #[serde(deserialize_with = "crate::serde_helpers::duration_from_seconds")]
-    duration: chrono::Duration,
-    file: String,
+    pub duration: chrono::Duration,
+    pub file: String,
     #[serde(deserialize_with = "deserialize_number_from_string")]
-    size: u64,
-    container: String,
-    indexes: Option<String>,
-    audio_profile: Option<String>,
-    video_profile: Option<String>,
+    pub size: u64,
+    pub container: String,
+    pub indexes: Option<String>,
+    pub audio_profile: Option<String>,
+    pub video_profile: Option<String>,
     #[serde(default, rename = "Stream")]
-    streams: Vec<MediaStream>,
+    pub streams: Vec<MediaStream>,
 }
 
 #[derive(Debug, Deserialize, Clone)]
@@ -37,110 +37,112 @@ pub struct MediaTag {
 #[serde(rename_all = "camelCase")]
 pub struct Media {
     #[serde(deserialize_with = "deserialize_number_from_string")]
-    id: u32,
+    pub id: u32,
     #[serde(deserialize_with = "crate::serde_helpers::duration_from_seconds")]
-    duration: chrono::Duration,
+    pub duration: chrono::Duration,
     #[serde(deserialize_with = "deserialize_number_from_string")]
-    bitrate: u32,
-    width: Option<u16>,
-    height: Option<u16>,
-    aspect_ratio: Option<f32>,
+    pub bitrate: u32,
+    pub width: Option<u16>,
+    pub height: Option<u16>,
+    pub aspect_ratio: Option<f32>,
     #[serde(deserialize_with = "deserialize_number_from_string")]
-    audio_channels: u8,
-    audio_codec: String,
-    video_codec: Option<String>,
-    video_resolution: Option<String>,
-    container: String,
-    video_frame_rate: Option<String>,
-    audio_profile: Option<String>,
-    video_profile: Option<String>,
+    pub audio_channels: u8,
+    pub audio_codec: String,
+    pub video_codec: Option<String>,
+    pub video_resolution: Option<String>,
+    pub container: String,
+    pub video_frame_rate: Option<String>,
+    pub audio_profile: Option<String>,
+    pub video_profile: Option<String>,
     #[serde(rename = "Part")]
-    parts: Option<Vec<MediaPart>>,
+    pub parts: Option<Vec<MediaPart>>,
 }
 
 #[derive(Debug, Deserialize, Clone)]
 #[cfg_attr(all(test, feature = "test_new_attributes"), serde(deny_unknown_fields))]
 #[serde(rename_all = "camelCase")]
 pub struct MediaMetadata {
-    allow_sync: Option<bool>,
+    pub allow_sync: Option<bool>,
     #[serde(rename = "librarySectionID", deserialize_with = "deserialize_number_from_string")]
-    library_section_id: u32,
-    library_section_title: String,
+    pub library_section_id: u32,
+    pub library_section_title: String,
     #[serde(rename = "librarySectionUUID")]
-    library_section_uuid: Option<Uuid>,
-    rating_key: String,
-    key: String,
-    skip_parent: Option<bool>,
-    parent_rating_key: Option<String>,
-    grandparent_rating_key: Option<String>,
-    guid: Option<String>,
-    parent_guid: Option<String>,
-    grandparent_guid: Option<String>,
+    pub library_section_uuid: Option<Uuid>,
+    pub rating_key: String,
+    pub key: String,
+    pub skip_parent: Option<bool>,
+    pub parent_rating_key: Option<String>,
+    pub grandparent_rating_key: Option<String>,
+    pub guid: Option<String>,
+    pub parent_guid: Option<String>,
+    pub grandparent_guid: Option<String>,
     #[serde(rename = "type")]
-    media_type: MediaType,
-    title: String,
-    grandparent_key: Option<String>,
-    parent_key: Option<String>,
-    library_section_key: Option<String>,
-    grandparent_title: Option<String>,
-    parent_title: Option<String>,
-    content_rating: Option<String>,
-    summary: String,
+    pub media_type: MediaType,
+    pub title: String,
+    pub grandparent_key: Option<String>,
+    pub parent_key: Option<String>,
+    pub library_section_key: Option<String>,
+    pub grandparent_title: Option<String>,
+    pub parent_title: Option<String>,
+    pub content_rating: Option<String>,
+    pub summary: String,
     #[serde(deserialize_with = "crate::serde_helpers::option_int_from_string")]
-    index: Option<u32>,
+    pub index: Option<u32>,
     #[serde(deserialize_with = "crate::serde_helpers::option_int_from_string")]
-    parent_index: Option<u32>,
+    pub parent_index: Option<u32>,
     #[serde(
         default,
         deserialize_with = "crate::serde_helpers::option_int_from_string"
     )]
-    year: Option<u32>,
-    thumb: String,
-    art: Option<String>,
-    parent_thumb: Option<String>,
-    grandparent_thumb: Option<String>,
-    grandparent_art: Option<String>,
-    grandparent_theme: Option<String>,
+    pub year: Option<u32>,
+    pub thumb: String,
+    pub art: Option<String>,
+    pub parent_thumb: Option<String>,
+    pub grandparent_thumb: Option<String>,
+    pub grandparent_art: Option<String>,
+    pub grandparent_theme: Option<String>,
     #[serde(
         default,
         deserialize_with = "crate::serde_helpers::option_duration_from_seconds"
     )]
-    duration: Option<chrono::Duration>,
+    pub duration: Option<chrono::Duration>,
     #[serde(
         default,
         deserialize_with = "crate::serde_helpers::option_date_from_iso"
     )]
-    originally_available_at: Option<chrono::Date<chrono::Utc>>,
+    pub originally_available_at: Option<chrono::Date<chrono::Utc>>,
     #[serde(deserialize_with = "crate::serde_helpers::datetime_from_seconds_string")]
-    added_at: chrono::DateTime<chrono::Utc>,
+    pub added_at: chrono::DateTime<chrono::Utc>,
     #[serde(default, deserialize_with = "crate::serde_helpers::option_datetime_from_seconds_string")]
-    updated_at: Option<chrono::DateTime<chrono::Utc>>,
+    pub updated_at: Option<chrono::DateTime<chrono::Utc>>,
     #[serde(default, rename = "Media")]
-    media: Vec<Media>,
+    pub media: Vec<Media>,
     #[serde(rename = "Genre")]
-    genre: Option<Vec<MediaTag>>,
+    pub genre: Option<Vec<MediaTag>>,
     #[serde(rename = "Director")]
-    director: Option<Vec<MediaTag>>,
+    pub director: Option<Vec<MediaTag>>,
     #[serde(rename = "Writer")]
-    writer: Option<Vec<MediaTag>>,
+    pub writer: Option<Vec<MediaTag>>,
     #[serde(rename = "Country")]
-    country: Option<Vec<MediaTag>>,
+    pub country: Option<Vec<MediaTag>>,
     #[serde(rename = "Role")]
-    role: Option<Vec<MediaTag>>,
-    leaf_count: Option<u32>,
-    viewed_leaf_count: Option<u32>,
-    loudness_analysis_version: Option<String>,
-    deep_analysis_version: Option<String>,
-    studio: Option<String>,
-    rating: Option<f32>,
-    tagline: Option<String>,
+    pub role: Option<Vec<MediaTag>>,
+    pub leaf_count: Option<u32>,
+    pub viewed_leaf_count: Option<u32>,
+    pub loudness_analysis_version: Option<String>,
+    pub deep_analysis_version: Option<String>,
+    pub studio: Option<String>,
+    pub rating: Option<f32>,
+    pub tagline: Option<String>,
     #[serde(
         default,
         deserialize_with = "crate::serde_helpers::option_bool_from_anything"
     )]
-    has_premium_primary_extra: Option<bool>,
-    primary_extra_key: Option<String>,
-    rating_image: Option<String>,
-    parent_summary: Option<String>,
-    parent_theme: Option<String>,
+    pub has_premium_primary_extra: Option<bool>,
+    pub primary_extra_key: Option<String>,
+    pub rating_image: Option<String>,
+    pub parent_summary: Option<String>,
+    pub parent_theme: Option<String>,
+    #[serde(default)]
+    pub original_title: Option<String>,
 }

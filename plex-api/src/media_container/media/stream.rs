@@ -10,7 +10,7 @@ use serde_repr::Deserialize_repr;
 
 #[derive(Debug, Deserialize_repr, Clone)]
 #[repr(u8)]
-enum MediaStreamType {
+pub enum MediaStreamType {
     Unknown = 0,
     Video = 1,
     Audio = 2,
@@ -59,7 +59,7 @@ struct MediaStreamStruct {
     default: Option<bool>,
     #[serde(deserialize_with = "crate::serde_helpers::option_bool_from_anything")]
     selected: Option<bool>,
-    codec: String,
+    codec: Option<String>,
     #[serde(deserialize_with = "deserialize_option_number_from_string")]
     index: Option<u8>,
     #[serde(deserialize_with = "deserialize_option_number_from_string")]
@@ -120,12 +120,12 @@ macro_rules! media_stream_enum {
     }) => {
         #[derive(Debug, Clone)]
         pub struct $name {
-            id: u32,
-            stream_type: MediaStreamType,
-            codec: String,
-            index: Option<u8>,
-            display_title: String,
-            $($field_name: $field_type,)+
+            pub id: u32,
+            pub stream_type: MediaStreamType,
+            pub codec: Option<String>,
+            pub index: Option<u8>,
+            pub display_title: String,
+            pub $($field_name: $field_type,)+
         }
 
         impl From<MediaStreamStruct> for $name {
